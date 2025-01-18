@@ -37,10 +37,17 @@ const deletePost = {
   }),
 };
 
+const addComment = {
+  body: Joi.object().keys({
+    content: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   getPosts,
   addPost,
   getPost,
   updatePost,
   deletePost,
+  addComment,
 };

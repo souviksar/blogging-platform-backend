@@ -11,6 +11,7 @@ const Messages = {
   postUpdatationSuccess: { message: 'Post updated successfully.' },
   postDeletionSuccess: { message: 'Post deleted successfully.' },
   postNotFound: { message: 'Post not found!' },
+  commentAddedSuccess: { message: 'Comment added successfully.' },
 };
 
 module.exports = Messages;

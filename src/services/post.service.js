@@ -9,9 +9,18 @@ const ApiError = require('../utils/ApiError');
  * @param {Number} page
  */
 const getPosts = async (limit, page) => {
-  const posts = await Post.find().sort({ created_at: -1 }).populate('author');
+  const totalItems = await Post.find().countDocuments();
+  const posts = await Post.find()
+    .sort({ created_at: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .populate('author', 'name email');
   const postList = {
     posts,
+    page,
+    limit,
+    totalPages: Math.ceil(totalItems / limit),
+    totalResults: totalItems,
   };
   return postList;
 };
@@ -30,7 +39,7 @@ const addPost = async (userId, payload) => {
  * @param {String} postId
  */
 const getPost = async (postId) => {
-  const postData = await Post.findById(postId).populate('author');
+  const postData = await Post.findById(postId).populate('author', 'name email').populate('comments.commenter', 'name email');
   if (!postData) {
     throw new ApiError(httpStatus.BAD_REQUEST, messageLib.postNotFound.message);
   }
@@ -56,4 +65,20 @@ const deletePost = async (postId) => {
   await Post.deleteOne({ _id: postId });
 };
 
-module.exports = { getPosts, addPost, getPost, updatePost, deletePost };
+/**
+ * Add comment
+ * @param {String} userId
+ * @param {String} postId
+ * @param {*} payload
+ */
+const addComment = async (userId, postId, payload) => {
+  await getPost(postId);
+  await Post.updateOne(
+    { _id: postId },
+    {
+      $push: { comments: { commenter: userId, content: payload.content } },
+    }
+  );
+};
+
+module.exports = { getPosts, addPost, getPost, updatePost, deletePost, addComment };
