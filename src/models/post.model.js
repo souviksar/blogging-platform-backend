@@ -36,7 +36,11 @@ const postSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    comments: [commentSchema],
+    comments: { type: [commentSchema], default: [] },
+    status: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
